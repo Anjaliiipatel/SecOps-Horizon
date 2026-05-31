@@ -166,11 +166,7 @@
 
     <script>
         // Safely extract relational metrics mapping from the Flask engine payload
-        const rawChartData = [
-            {% for item in chart_data %}
-                { type: "{{ item.incident_type }}", count: {{ item.volume }} },
-            {% endfor %}
-        ];
+        const rawChartData = JSON.parse('{{ chart_data | default([]) | tojson | safe }}');
 
         // Format labels and query counts for data extraction matrices
         const chartLabels = rawChartData.map(item => item.type);
