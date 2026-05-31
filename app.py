@@ -4,35 +4,24 @@ from mysql.connector import pooling
 import logging
 
 app = Flask(__name__)
-
-# Configure application logging
 logging.basicConfig(level=logging.INFO)
 
-# ==========================================
-# ADVANCED: ENTERPRISE CONNECTION POOLING
-# ==========================================
 try:
     db_pool = pooling.MySQLConnectionPool(
         pool_name="soc_pool",
-        pool_size=5,                # Keeps 5 reusable database connections open in memory
-        pool_reset_session=True,    # Automatically cleans up user variables between pages
+        pool_size=5,
+        pool_reset_session=True,
         host="localhost",
-        user="root",                # Update if using a different user account
+        user="root",
         password="Raider007!",  # <-- Put your real MySQL password here
         database="incident_tracker"
     )
-    logging.info("MySQL Connection Pool initialized successfully.")
 except mysql.connector.Error as err:
-    logging.error(f"Failed to create connection pool: {err}")
+    logging.error(f"Pool creation failure: {err}")
     raise
 
 def get_db_connection():
-    # Requests an active, pre-established connection from the memory pool
     return db_pool.get_connection()
-
-# ==========================================
-# APPLICATION ROUTES
-# ==========================================
 
 @app.route('/')
 def dashboard():
@@ -40,52 +29,48 @@ def dashboard():
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Query 1: Fetch the aggregated analyst workload view
+        # Query 1: Fetch aggregated analyst workload metrics
         cursor.execute("SELECT * FROM v_analyst_workload_metrics;")
         metrics = cursor.fetchall()
         
-        # Query 2: Fetch the raw, chronological history of all incidents
-        cursor.execute("SELECT * FROM incidents ORDER BY date_detected DESC;")
+        # Query 2: Fetch chronological incident history logs
+        cursor.execute("SELECT * FROM incidents ORDER BY date_detected DESC LIMIT 50;")
         history = cursor.fetchall()
         
+        # Query 3: Fetch structural graph metrics counting types of active threats
+        cursor.execute("""
+            SELECT incident_type, COUNT(*) as volume 
+            FROM incidents 
+            GROUP BY incident_type;
+        """)
+        chart_data = cursor.fetchall()
+        
     except mysql.connector.Error as err:
-        logging.error(f"Database read error: {err}")
-        metrics, history = [], []
+        logging.error(f"Read failure: {err}")
+        metrics, history, chart_data = [], [], []
     finally:
         cursor.close()
-        conn.close() # Returns the connection back to the pool instead of destroying it
+        conn.close()
     
-    return render_template('dashboard.html', metrics=metrics, incidents=history)
+    return render_template('dashboard.html', metrics=metrics, incidents=history, chart_data=chart_data)
 
 @app.route('/add_incident', methods=['POST'])
 def add_incident():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Securely extract values from the submitted HTML form
-    incident_id = request.form['incident_id']
-    incident_type = request.form['incident_type']
-    asset_id = request.form['asset_id']
-    analyst_id = request.form['analyst_id']
-    
-    # ==========================================
-    # SECURITY: STALWART SQL PARAMETERIZATION
-    # ==========================================
-    # Using %s wildcards completely prevents SQL Injection (SQLi) attacks.
     query = """
     INSERT INTO incidents (incident_id, incident_type, date_detected, severity, status, asset_id, analyst_id)
     VALUES (%s, %s, CURDATE(), 'Low', 'Investigating', %s, %s)
     """
-    
     try:
-        cursor.execute(query, (incident_id, incident_type, asset_id, analyst_id))
-        conn.commit()  # Commits the transaction to the database schema
+        cursor.execute(query, (request.form['incident_id'], request.form['incident_type'], request.form['asset_id'], request.form['analyst_id']))
+        conn.commit()
     except mysql.connector.Error as err:
-        logging.error(f"Database write error: {err}")
+        logging.error(f"Write failure: {err}")
     finally:
         cursor.close()
-        conn.close() # Connection goes back to the pool safely
-    
+        conn.close()
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
