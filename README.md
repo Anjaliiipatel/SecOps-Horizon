@@ -16,6 +16,9 @@ Featuring custom database automation, optimized collection pooling, and a premiu
 
 ---
 
+## System Architecture
+<img width="5320" height="3829" alt="SecOps System Architecture" src="https://github.com/user-attachments/assets/610ba9cc-a9ec-4953-a9a3-4ad69b44b29b" />
+
 ## 📂 System Directory Structure
 
 ```text
