@@ -3,143 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecOps Workspace</title>
+    <title>Enterprise Security Operations Center (v2.4)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background-color: #f5f5f7; /* iOS Light Mode Base */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #060814;
+            background-image: radial-gradient(circle at top right, rgba(29, 78, 216, 0.07) 0%, transparent 50%);
         }
-        @media (prefers-color-scheme: dark) {
-            body { background-color: #000000; }
-        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
-<body class="text-slate-900 dark:text-slate-100 min-h-screen antialiased bg-[#f5f5f7] dark:bg-[#090a0f]">
+<body class="text-slate-100 min-h-screen antialiased selection:bg-blue-500/30">
+
+    <header class="bg-[#0b1329]/40 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-50 px-6 py-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg font-bold shadow-blue-500/20">🛡️</div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">Enterprise SecOps <span class="text-[10px] tracking-widest font-mono text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">LIVE V2.4</span></h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Secured Node Pipeline Engine Connection</p>
+                </div>
+            </div>
+            <div class="inline-flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-xl text-xs font-semibold shadow-inner">
+                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-slate-300">MySQL Cluster Connected</span>
+            </div>
+        </div>
+    </header>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <header class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">SecOps Command</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Live infrastructure telemetry from MySQL Engine</p>
-            </div>
-            <div class="inline-flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-full text-xs font-semibold shadow-sm border border-slate-200 dark:border-slate-800">
-                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-slate-600 dark:text-slate-300">100 Active Responders</span>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             
-            <div class="lg:col-span-2 space-y-8">
-                
+            <div class="lg:col-span-2 bg-[#0c1020]/80 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between min-h-[360px]">
                 <div>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 pl-1">Team Overview Matrix</h2>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[460px] overflow-y-auto pr-2 border border-transparent focus-within:border-slate-200 dark:focus-within:border-slate-800 rounded-xl">
-                        {% for row in metrics %}
-                        <div class="bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
-                                        {{ row.analyst_name[:2].upper() }}
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-sm tracking-tight text-slate-900 dark:text-white">{{ row.analyst_name }}</h3>
-                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Active Specialist</p>
-                                    </div>
-                                </div>
-                                
-                                {% if row.handling_critical_threats > 0 %}
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20">ALERT</span>
-                                {% else %}
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500">IDLE</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800/40">
-                                <div class="text-center w-1/3">
-                                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Assigned</span>
-                                    <p class="text-sm font-bold text-slate-700 dark:text-slate-300 mt-0.5">{{ row.total_assigned_incidents }}</p>
-                                </div>
-                                <div class="text-center w-1/3 border-x border-slate-100 dark:border-slate-800/40">
-                                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Active</span>
-                                    <p class="text-sm font-bold text-amber-500 mt-0.5">{{ row.active_threats }}</p>
-                                </div>
-                                <div class="text-center w-1/3">
-                                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Critical</span>
-                                    <p class="text-sm font-bold text-red-500 mt-0.5">{{ row.handling_critical_threats }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Threat Distribution Vector</h2>
+                    <p class="text-[11px] text-slate-500 font-medium mb-4">Real-time incident volumes structured by classification schema</p>
                 </div>
-
-                <div>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 pl-1">Live Incident Audit Ledger</h2>
-                    <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold uppercase tracking-wider">
-                                    <th class="px-5 py-3">Classification</th>
-                                    <th class="px-5 py-3">Timestamp</th>
-                                    <th class="px-5 py-3">Priority Matrix</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/40 font-medium text-slate-700 dark:text-slate-300">
-                                {% for incident in incidents %}
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
-                                    <td class="px-5 py-3.5 text-slate-900 dark:text-white font-semibold">{{ incident.incident_type }}</td>
-                                    <td class="px-5 py-3.5 text-slate-400">{{ incident.date_detected }}</td>
-                                    <td class="px-5 py-3.5">
-                                        {% if incident.severity == 'Critical' %}
-                                            <span class="px-2 py-0.5 rounded-md bg-red-500/10 text-red-500 font-bold border border-red-500/20">Critical</span>
-                                        {% elif incident.severity == 'Medium' %}
-                                            <span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20">Medium</span>
-                                        {% else %}
-                                            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-400">Low</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="w-full flex-1 relative flex items-center justify-center">
+                    <canvas id="incidentMetricsChart" class="max-h-[240px]"></canvas>
                 </div>
-
             </div>
 
-            <div>
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 pl-1">Action Terminal</h2>
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm sticky top-8">
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">Dispatch Telemetry</h3>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-5">Instantly pass new data streams directly into active schema paths.</p>
-                    
-                    <form action="/add_incident" method="POST" class="space-y-4">
+            <div class="bg-[#0c1020]/80 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-1 tracking-tight">Telemetry Dispatch Terminal</h3>
+                    <p class="text-xs text-slate-500 mb-5 font-medium">Direct write pipeline back into underlying structural schema tracks.</p>
+                </div>
+                <form action="/add_incident" method="POST" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Incident ID</label>
-                            <input type="number" name="incident_id" placeholder="e.g. 5251" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-medium" required>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Incident ID</label>
+                            <input type="number" name="incident_id" placeholder="e.g. 5251" class="w-full bg-[#05070f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700" required>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Classification Type</label>
-                            <input type="text" name="incident_type" placeholder="e.g. Ransomware" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-medium" required>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Classification</label>
+                            <input type="text" name="incident_type" placeholder="e.g. Phishing" class="w-full bg-[#05070f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700" required>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Asset Vector ID</label>
-                                <input type="number" name="asset_id" placeholder="1 - 50" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-medium" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Asset Vector</label>
+                            <input type="number" name="asset_id" placeholder="1 - 50" class="w-full bg-[#05070f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700" required>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Responder ID</label>
+                            <input type="number" name="analyst_id" placeholder="101 - 200" class="w-full bg-[#05070f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-medium placeholder-slate-700" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white text-xs font-semibold py-3 rounded-xl transition-all shadow-md shadow-blue-600/10 mt-2">
+                        Commit Entry to System
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            
+            <div class="xl:col-span-2 space-y-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 pl-1">Operational Personnel Overview Matrix</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[460px] overflow-y-auto pr-2">
+                    {% for row in metrics %}
+                    <div class="bg-[#0c1020]/40 border border-slate-800/60 rounded-2xl p-5 shadow-sm hover:border-slate-700/60 hover:bg-[#0c1020]/80 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-slate-800 to-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-slate-300 shadow-inner">
+                                    {{ row.analyst_name[:2].upper() }}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm tracking-tight text-white">{{ row.analyst_name }}</h3>
+                                    <p class="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">SecOps Responder</p>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Responder ID</label>
-                                <input type="number" name="analyst_id" placeholder="101 - 200" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 font-medium" required>
+                            {% if row.handling_critical_threats > 0 %}
+                                <span class="px-2 py-0.5 rounded text-[9px] font-extrabold bg-red-500/10 text-red-400 border border-red-500/20 shadow-sm animate-pulse">ALERT</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 rounded text-[9px] font-medium bg-slate-800 text-slate-400 border border-slate-700/40">IDLE</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex items-center justify-between text-center text-xs pt-3 border-t border-slate-800/40 font-mono">
+                            <div class="w-1/3">
+                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Assigned</span>
+                                <p class="text-sm font-bold text-slate-300">{{ row.total_assigned_incidents }}</p>
+                            </div>
+                            <div class="w-1/3 border-x border-slate-800/40">
+                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Active</span>
+                                <p class="text-sm font-bold text-amber-400">{{ row.active_threats }}</p>
+                            </div>
+                            <div class="w-1/3">
+                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Critical</span>
+                                <p class="text-sm font-bold text-red-500">{{ row.handling_critical_threats }}</p>
                             </div>
                         </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white text-xs font-semibold py-3 rounded-xl transition-all shadow-sm shadow-blue-600/20 mt-2">
-                            Commit Entry to Schema
-                        </button>
-                    </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 pl-1">Live Chronological Event Stream</h2>
+                <div class="bg-[#0c1020]/30 border border-slate-800/60 rounded-2xl overflow-hidden shadow-xl max-h-[460px] overflow-y-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950/60 border-b border-slate-800/80 text-slate-400 font-semibold uppercase tracking-wider sticky top-0 backdrop-blur-md">
+                                <th class="px-4 py-3">Classification</th>
+                                <th class="px-4 py-3">Threat Tier</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-900/40 font-medium text-slate-300">
+                            {% for incident in incidents %}
+                            <tr class="hover:bg-slate-800/10 transition-colors">
+                                <td class="px-4 py-3">
+                                    <p class="text-white font-bold tracking-tight">{{ incident.incident_type }}</p>
+                                    <span class="text-[10px] font-mono text-slate-500">ID: #{{ incident.incident_id }}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    {% if incident.severity == 'Critical' %}
+                                        <span class="px-2 py-0.5 rounded text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 font-extrabold">CRIT</span>
+                                    {% elif incident.severity == 'Medium' %}
+                                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">MED</span>
+                                    {% else %}
+                                        <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 border border-slate-700/40 font-semibold">LOW</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -147,5 +164,53 @@
 
     </div>
 
+    <script>
+        // Safely extract relational metrics mapping from the Flask engine payload
+        const rawChartData = [
+            {% for item in chart_data %}
+                { type: "{{ item.incident_type }}", count: {{ item.volume }} },
+            {% endfor %}
+        ];
+
+        // Format labels and query counts for data extraction matrices
+        const chartLabels = rawChartData.map(item => item.type);
+        const chartValues = rawChartData.map(item => item.count);
+
+        // Instantiate Chart.js Engine Configuration
+        const ctx = document.getElementById('incidentMetricsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Active Incident Count',
+                    data: chartValues,
+                    backgroundColor: 'rgba(37, 99, 235, 0.45)',     /* Sleek semi-translucent sapphire blue */
+                    borderColor: '#3b82f6',                        /* Solid vibrant neon border lines */
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                    hoverBackgroundColor: 'rgba(59, 130, 246, 0.75)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } /* Hides unnecessary clutter */
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#64748b', font: { size: 10, weight: '500' } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(30, 41, 59, 0.3)' },
+                        ticks: { color: '#64748b', font: { size: 10, fontMono: true } },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
